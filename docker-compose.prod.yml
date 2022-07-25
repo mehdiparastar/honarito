@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  mongosetup:
+    container_name: mongosetup
+    image: mongo:4.4
+    volumes:
+      - ./db/rs-init.sh:/scripts/rs-init.sh
+      - ./db/db-setup-entrypoint.sh:/scripts/db-setup-entrypoint.sh
+      - ./db/wait-for:/scripts/wait-for
+    depends_on:
+      - db1
+      - db2
+      - db3
+    restart: "no"
+    entrypoint: [ "./scripts/db-setup-entrypoint.sh" ]
+
+  db1:
+    container_name: db1
+    image: mongo:4.4
+    volumes:
+      - ./db/data1:/data/db
+    ports:
+      - 27021:27017
+    links:
+      - db2
+      - db3
+    restart: unless-stopped
+    entrypoint:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "dbrs"
+      ]
+
+  db2:
+    container_name: db2
+    image: mongo:4.4
+    volumes:
+      - ./db/data2:/data/db
+    ports:
+      - 27022:27017
+    restart: unless-stopped
+    entrypoint:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "dbrs"
+      ]
+
+  db3:
+    container_name: db3
+    image: mongo:4.4
+    volumes:
+      - ./db/data3:/data/db
+    ports:
+      - 27023:27017
+    restart: unless-stopped
+    entrypoint:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "dbrs"
+      ]
+
+  server:
+    container_name: server
+    depends_on:
+      - db1
+      - db2
+      - db3
+    build: ./honarito_server
+    ports:
+      - 3001:3001
+    restart: unless-stopped
+    environment:
+      - REPLICA_URL=mongodb://db1:27017,db2:27017,db3:27017
+      - REPLICA_NAME=dbrs

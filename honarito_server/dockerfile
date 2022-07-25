@@ -1,0 +1,11 @@
+FROM node:17.7.2-alpine3.15
+RUN addgroup app && adduser -S -G app app
+RUN mkdir /app && chown app:app /app
+USER app
+WORKDIR /app
+RUN mkdir data
+COPY package*.json ./
+RUN yarn install
+COPY . .
+EXPOSE 3001
+CMD ["yarn", "start"]
