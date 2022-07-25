@@ -9,6 +9,10 @@ sleep 5
 
 echo "starting app..."
 
+chmod -R 777 ./db
+
+sleep 5
+
 docker-compose up --build -d
 
 sleep 5
