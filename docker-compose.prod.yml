@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   mongosetup:
@@ -13,7 +13,7 @@ services:
       - db2
       - db3
     restart: "no"
-    entrypoint: [ "./scripts/db-setup-entrypoint.sh" ]
+    entrypoint: ["sh", "./scripts/db-setup-entrypoint.sh"]
 
   db1:
     container_name: db1
@@ -26,13 +26,7 @@ services:
       - db2
       - db3
     restart: unless-stopped
-    entrypoint:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "dbrs"
-      ]
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
 
   db2:
     container_name: db2
@@ -42,13 +36,7 @@ services:
     ports:
       - 27022:27017
     restart: unless-stopped
-    entrypoint:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "dbrs"
-      ]
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
 
   db3:
     container_name: db3
@@ -58,13 +46,7 @@ services:
     ports:
       - 27023:27017
     restart: unless-stopped
-    entrypoint:
-      [
-        "/usr/bin/mongod",
-        "--bind_ip_all",
-        "--replSet",
-        "dbrs"
-      ]
+    entrypoint: ["/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs"]
 
   server:
     container_name: server
